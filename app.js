@@ -167,12 +167,12 @@ function validateRows(rows) {
   }
   const keys = Object.keys(rows[0] || {});
   const hasDriver = keys.find((k) => k.toLowerCase().includes("kierowca"));
-  const hasSolo = keys.find((k) => k.toLowerCase().includes("kilometry solo"));
+  const hasSolo = keys.find((k) => k.toLowerCase().includes("kilometry solo") || k.toLowerCase().includes("kilometry all"));
   const duetCols = keys.filter((k) => k.toLowerCase().startsWith("kilometry z"));
   if (!hasDriver || !hasSolo || duetCols.length === 0) {
     return {
       ok: false,
-      reason: "Brak kolumn 'Kierowca', 'Kilometry solo' lub dowolnej kolumny 'Kilometry z ...'.",
+      reason: "Brak kolumn 'Kierowca', 'Kilometry all' (lub 'Kilometry solo') oraz co najmniej jednej kolumny 'Kilometry z ...'.",
     };
   }
   return { ok: true };
@@ -187,7 +187,7 @@ function transformRows(rows) {
   rows.forEach((row) => {
     const name = String(row["Kierowca"] || row["kierowca"] || "").trim();
     if (!name) return;
-    const kilometrySolo = toNumber(row["Kilometry solo"] ?? row["kilometry solo"]);
+    const kilometryAll = toNumber(row["Kilometry all"] ?? row["kilometry all"] ?? row["Kilometry solo"] ?? row["kilometry solo"]);
     let kilometryNaBarana = 0;
     const duets = [];
 
@@ -206,7 +206,8 @@ function transformRows(rows) {
       }
     });
 
-    const kilometryTotal = kilometrySolo + kilometryNaBarana;
+    const kilometrySolo = Math.max(0, kilometryAll - kilometryNaBarana);
+    const kilometryTotal = kilometryAll; // kolumna all to łączny dystans
     soloSum += kilometrySolo;
     baranaSum += kilometryNaBarana;
     duets.sort((a, b) => b.km - a.km);
