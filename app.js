@@ -1,4 +1,4 @@
-﻿// Prosty frontend w czystym JS: obsluga uploadu XLSX, przetwarzanie danych,
+// Prosty frontend w czystym JS: obsluga uploadu XLSX, przetwarzanie danych,
 // zapis w localStorage oraz wizualizacje Chart.js.
 
 const STORAGE_KEY = "kilometry-datasets";
@@ -75,10 +75,19 @@ function computeTotals(driversAdj) {
 
   const soloSum = driversAdj.reduce((acc, d) => acc + d.kilometrySolo, 0);
 
-  // km na barana do ogólnej statystyki: NIE wliczamy obsad podwójnych (tylko solo dla nich)
-  const baranaSum = driversAdj
-    .filter((d) => !nameToGroup.has(d.name.toLowerCase()))
-    .reduce((acc, d) => acc + d.kilometryNaBaranaAdj, 0);
+  // km na barana do ogólnej statystyki: sumujemy unikalne pary, ale pomijamy pary z kierowcami z podwójnej obsady
+  let baranaSum = 0;
+  if (currentData && currentData.duetPairs) {
+    currentData.duetPairs.forEach(({ a, b, km }) => {
+      if (!nameToGroup.has(a.toLowerCase()) && !nameToGroup.has(b.toLowerCase())) {
+        baranaSum += km;
+      }
+    });
+  } else {
+    baranaSum = driversAdj
+      .filter((d) => !nameToGroup.has(d.name.toLowerCase()))
+      .reduce((acc, d) => acc + d.kilometryNaBaranaAdj, 0);
+  }
 
   const totalKm = soloSum + baranaSum;
   return {
@@ -190,7 +199,9 @@ function transformRows(rows) {
           const partner = key.replace(/kilometry z\s*/i, "").trim();
           duets.push({ partner, km });
           const pairKey = [name, partner].sort((a, b) => a.localeCompare(b, "pl")).join(" :: ");
-          duetMap.set(pairKey, (duetMap.get(pairKey) || 0) + km);
+          const existing = duetMap.get(pairKey) || 0;
+          // unikamy podwójnego liczenia pary w obie strony – bierzemy maksimum z wpisów
+          duetMap.set(pairKey, Math.max(existing, km));
         }
       }
     });
@@ -208,7 +219,7 @@ function transformRows(rows) {
   const duetPairs = Array.from(duetMap.entries())
     .map(([key, km]) => {
       const [a, b] = key.split(" :: ");
-      return { pair: `${a} + ${b}`, km };
+      return { pair: `${a} + ${b}`, km, a, b };
     })
     .sort((a, b) => b.km - a.km);
 
