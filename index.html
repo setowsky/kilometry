@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analiza kilometrów kierowców</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Patryk Seta</p>
+        <h1>Analiza kilometrów kierowców</h1>
+        <p class="lead">Wgraj arkusz XLSX, zobacz ranking przejazdów, zapisz miesiąc i wróć do danych kiedy chcesz.</p>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="panel upload">
+        <div class="panel-header">
+          <div>
+            <h2>Wgraj plik XLSX</h2>
+          </div>
+        </div>
+
+        <div id="drop-zone" class="dropzone">
+          <div class="drop-icon">☁️</div>
+          <div>
+            <strong>Przeciągnij plik tutaj</strong>
+            <p>...lub <label for="file-input" class="fake-link">kliknij aby wybrać</label></p>
+          </div>
+          <input id="file-input" type="file" accept=".xlsx,.xls" hidden />
+        </div>
+
+        <div class="form-row">
+          <label for="dataset-name">Etykieta miesiąca / pliku</label>
+          <input id="dataset-name" type="text" placeholder="np. 2025-10" />
+        </div>
+
+        <div class="action-row">
+          <button id="process-btn" class="primary">Przetwórz plik</button>
+          <button id="save-btn" class="ghost">Zapisz w przeglądarce</button>
+          <div class="status" id="status-text">Brak danych.</div>
+        </div>
+
+        <div class="saved">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Zapisane miesiące</p>
+              <h3>Twoje importy</h3>
+            </div>
+            <button id="clear-storage" class="text-btn">Wyczyść wszystko</button>
+          </div>
+          <ul id="saved-list" class="saved-list"></ul>
+        </div>
+      </section>
+
+      <section class="panel drivers">
+        <div class="panel-header">
+          <div>
+            <h2>Wybierz kierowcę</h2>
+          </div>
+        </div>
+        <div class="driver-controls">
+          <input id="driver-search" type="search" placeholder="Szukaj kierowcy..." />
+          <select id="driver-select" size="8"></select>
+        </div>
+
+        <div class="cards" id="driver-cards">
+          <div class="card">
+            <p class="eyebrow">Solo</p>
+            <div class="metric"><span id="solo-km">0</span> km</div>
+          </div>
+          <div class="card">
+            <p class="eyebrow">Na barana</p>
+            <div class="metric"><span id="barana-km">0</span> km</div>
+          </div>
+          <div class="card">
+            <p class="eyebrow">Łącznie</p>
+            <div class="metric"><span id="total-km">0</span> km</div>
+          </div>
+        </div>
+
+        <div class="duets">
+          <div class="panel-header">
+            <h3>Wspólne kilometry</h3>
+            <div class="hint">Tylko pary z dystansem > 0</div>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Partner</th><th>Km</th></tr>
+            </thead>
+            <tbody id="duet-table"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel dashboard">
+        <div class="panel-header">
+          <div>
+            <h2>Dashboard i rankingi</h2>
+          </div>
+        </div>
+
+        <div class="cards" id="summary-cards">
+          <div class="card">
+            <p class="eyebrow">Łączny dystans</p>
+            <div class="metric"><span id="sum-total">0</span> km</div>
+          </div>
+          <div class="card">
+            <p class="eyebrow">Solo</p>
+            <div class="metric"><span id="sum-solo">0</span> km</div>
+          </div>
+          <div class="card">
+            <p class="eyebrow">Na barana</p>
+            <div class="metric"><span id="sum-barana">0</span> km</div>
+          </div>
+          <div class="card">
+            <p class="eyebrow">% na barana</p>
+            <div class="metric"><span id="share-barana">0</span>%</div>
+          </div>
+        </div>
+
+        <div class="charts">
+          <div class="chart">
+            <h4>Top 10: łącznie</h4>
+            <canvas id="chart-total"></canvas>
+          </div>
+          <div class="chart">
+            <h4>Top 10: solo</h4>
+            <canvas id="chart-solo"></canvas>
+          </div>
+          <div class="chart">
+            <h4>Top 10: na barana</h4>
+            <canvas id="chart-barana"></canvas>
+          </div>
+          <div class="chart">
+            <h4>Top 10: system</h4>
+            <canvas id="chart-system"></canvas>
+          </div>
+          <div class="chart">
+            <h4>Podwójna obsada</h4>
+            <canvas id="chart-podwojna"></canvas>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
