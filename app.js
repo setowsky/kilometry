@@ -1,4 +1,4 @@
-// Prosty frontend w czystym JS: obsluga uploadu XLSX, przetwarzanie danych,
+﻿// Prosty frontend w czystym JS: obsluga uploadu XLSX, przetwarzanie danych,
 // zapis w localStorage oraz wizualizacje Chart.js.
 
 const STORAGE_KEY = "kilometry-datasets";
